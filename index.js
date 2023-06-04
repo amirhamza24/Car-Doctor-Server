@@ -27,7 +27,7 @@ const verifyJWT = (req, res, next) => {
     console.log('Hitting Verify JWT');
     console.log(req.headers.authorization);
     const authorization = req.headers.authorization;
-    if(authorization) {
+    if(!authorization) {
         return res.status(401).send({error: true, message: 'unauthorized access'});
     }
     const token = authorization.split(' ')[1];
@@ -81,7 +81,15 @@ async function run() {
 
     // bookings routes
     app.get('/bookings', verifyJWT, async (req, res) => {
+
+        const decoded = req.decoded;
         // console.log(req.headers.authorization);
+        console.log('Come back After Verify', decoded);
+
+        if(decoded.email !== req.query.email) {
+            return res.status(403).send({error: 1, message: 'forbidden access'});
+        }
+
         let query = {};
         if(req.query?.email) {
             query = { email: req.query.email }
