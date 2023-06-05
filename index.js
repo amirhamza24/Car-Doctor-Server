@@ -10,7 +10,6 @@ const port = process.env.PORT || 5000;
 app.use(cors());
 app.use(express.json());
 
-
 const uri = `mongodb+srv://${process.env.DB_USER}:${process.env.DB_PASS}@cluster0.oexcdfc.mongodb.net/?retryWrites=true&w=majority`;
 
 // Create a MongoClient with a MongoClientOptions object to set the Stable API version
@@ -60,7 +59,14 @@ async function run() {
 
     // services routes
     app.get('/services', async(req, res) => {
-        const cursor = serviceCollection.find();
+        const sort = req.query.sort;
+        const query = {};
+        const options = {
+            sort: { 
+                "price": sort === 'asc' ? 1 : -1
+            }
+        };
+        const cursor = serviceCollection.find( query, options );
         const result = await cursor.toArray();
         res.send(result);   
     })
